@@ -21,12 +21,9 @@ private slots:
 
 	void addDigit(QString digit)
 	{
-		if (lineEdit->text() == "ERROR")
-		{
-			lineEdit->clear();
-			CheckingForError = true;
-		}
-		lineEdit->setText(lineEdit->text() + digit);
+		if (lineEdit->text() == "ERROR") { lineEdit->clear(); }
+		else { lineEdit->setText(lineEdit->text() + digit); }
+		
 	}
 
 	void add0() { addDigit("0"); };
@@ -46,8 +43,16 @@ private slots:
 
 		hasInvalidSign(op);
 
+		bool isNumber;
+		FirstNumber = lineEdit->text().toInt(&isNumber);
+
+		if (!isNumber)
+		{
+			lineEdit->setText("ERROR");
+			CheckingForError = false;
+		}
+
 		operation = op;
-		
 		lineEdit->clear();
 	}
 
@@ -61,7 +66,7 @@ private slots:
 		else if (operation == "-" && CheckingForError) { Result = FirstNumber - SecondNumber; }
 		else if (operation == "/" && CheckingForError)
 		{
-			if (FirstNumber == 0) { CheckingForError = false; }
+			if (FirstNumber == 0 || SecondNumber == 0) { CheckingForError = false; }
 			else { Result = FirstNumber / SecondNumber; }
 
 		}
@@ -71,9 +76,9 @@ private slots:
 		else
 		{
 			lineEdit->setText("ERROR");
-			CheckingForError = true;
 		}
 
+		CheckingForError = true;
 		operation.clear();
 	}
 
@@ -99,14 +104,25 @@ private:
 
 	bool hasInvalidSign(QString& op)
 	{
-		for (QString c : op)
+		if (op.isEmpty()) { return CheckingForError = false; }
+
+		int operatorCount = 0;
+
+		for (QChar c : op)
 		{
-			if (c == "+" || c == "-" || c == "/" || c == "*")
+			if (c == '+' || c == '-' || c == '/' || c == '*') 
 			{
-				return CheckingForError = true;
+				operatorCount++;
+			}
+			else 
+			{
+				return CheckingForError = false;
 			}
 		}
-		return CheckingForError = false;
+
+		if (operatorCount == 1) { return CheckingForError = true; }
+		else { return CheckingForError = false; }
+
 	}
 
 };
