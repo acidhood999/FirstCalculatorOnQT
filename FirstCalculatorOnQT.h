@@ -5,7 +5,6 @@
 
 #include "ui_FirstCalculatorOnQT.h"
 
-
 class FirstCalculatorOnQT : public QMainWindow
 {
     Q_OBJECT
@@ -22,9 +21,13 @@ private slots:
 
 	void addDigit(QString digit)
 	{
+		if (lineEdit->text() == "ERROR")
+		{
+			lineEdit->clear();
+			CheckingForError = true;
+		}
 		lineEdit->setText(lineEdit->text() + digit);
 	}
-
 
 	void add0() { addDigit("0"); };
 	void add1() { addDigit("1"); };
@@ -40,19 +43,36 @@ private slots:
 	void addFirstOperation(QString op)
 	{
 		FirstNumber = lineEdit->text().toInt();
+
+		hasInvalidSign(op);
+
 		operation = op;
+		
 		lineEdit->clear();
 	}
-	void addSecondNumberAndResult() 
-	{ 
+
+	void addSecondNumberAndResult()
+	{
+
 		SecondNumber = lineEdit->text().toInt();
 
-		if (operation == "+") { Result = FirstNumber + SecondNumber; }
-		else if (operation == "-") { Result = FirstNumber - SecondNumber; }
-		else if (operation == "/") { Result = FirstNumber / SecondNumber; }
-		else if (operation == "*") { Result = FirstNumber * SecondNumber; }
 
-		lineEdit->setText(QString::number(Result));
+		if (operation == "+" && CheckingForError) { Result = FirstNumber + SecondNumber; }
+		else if (operation == "-" && CheckingForError) { Result = FirstNumber - SecondNumber; }
+		else if (operation == "/" && CheckingForError)
+		{
+			if (FirstNumber == 0) { CheckingForError = false; }
+			else { Result = FirstNumber / SecondNumber; }
+
+		}
+		else if (operation == "*" && CheckingForError) { Result = FirstNumber * SecondNumber; }
+
+		if (CheckingForError) { lineEdit->setText(QString::number(Result)); }
+		else
+		{
+			lineEdit->setText("ERROR");
+			CheckingForError = true;
+		}
 
 		operation.clear();
 	}
@@ -73,7 +93,20 @@ private:
 	int FirstNumber{};
 	int SecondNumber{};
 
+	bool CheckingForError { false };
+
 	QString operation{ "" };
 
+	bool hasInvalidSign(QString& op)
+	{
+		for (QString c : op)
+		{
+			if (c == "+" || c == "-" || c == "/" || c == "*")
+			{
+				return CheckingForError = false;
+			}
+		}
+		return CheckingForError = true;
+	}
 
 };
