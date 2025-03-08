@@ -103,10 +103,10 @@ private:
 		{
 			if (c == "+" || c == "-" || c == "/" || c == "*")
 			{
-				return CheckingForError = false;
+				return CheckingForError = true;
 			}
 		}
-		return CheckingForError = true;
+		return CheckingForError = false;
 	}
 
 };
