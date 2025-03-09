@@ -49,7 +49,7 @@ private slots:
 		if (!isNumber)
 		{
 			lineEdit->setText("ERROR");
-			CheckingForError = false;
+			CheckingForError = true;
 		}
 
 		operation = op;
